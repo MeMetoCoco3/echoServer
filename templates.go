@@ -2,22 +2,39 @@ package main
 
 import "html/template"
 
-var IssueList = template.
+var GetAllUsers = template.
 	Must(template.New("issueList").
-		Parse(`
-<h1>Users Table</h1>
+		Parse(
+			`<!DOCTYPE html>
+<html>
+<head>
+	<title>User Management</title>
+		<link rel="stylesheet" href="/static/style.css">
+	</head>
+<body>
+	<h1>Users Table</h1>
 	<table>
-		<tr style='text-align: left'>
+		<tr>
+			<th>ID</th>
 			<th>Name</th>
 			<th>Age</th>
 			<th>Role</th>
+			<th>Actions</th>
 		</tr>
-	{{range .}}
+		{{range .}}
 		<tr>
+			<td class="uuid-td">{{.ID}}</td>
 			<td><b>{{.Name}}</b></td>
 			<td>{{.Age}}</td>
 			<td>{{.Role}}</td>
+			<td>
+		<form action="/delete/{{.ID}}" method="POST" class="delete-form">
+					<button type="submit" class="delete-btn">Delete</button>
+				</form>
+			</td>
 		</tr>
-	{{end}}
+		{{end}}
 	</table>
-		`))
+</body>
+</html>
+`))

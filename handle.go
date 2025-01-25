@@ -54,27 +54,29 @@ func (s *ServerBU) handleGetAll(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"msg": "Error fetching users"})
 	}
 
-	// DEALING WITH HTML
 	var buff bytes.Buffer
 
-	err = IssueList.Execute(&buff, users)
+	err = GetAllUsers.Execute(&buff, users)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": err})
 	}
-	return c.JSON(http.StatusOK, users)
+
+	return c.HTMLBlob(http.StatusOK, buff.Bytes())
 }
 
 func (s *ServerBU) handleDelete(c echo.Context) error {
 	uuid := c.Param("id")
-	if uuid != "" {
+	if uuid == "" {
+		uuid = c.FormValue("id")
+	}
 
+	if uuid == "" {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": fmt.Errorf("Id was not introduced")})
 	}
 
 	err := s.Storage.Delete(uuid)
 	if err != nil {
-
-		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": err})
+		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": fmt.Errorf("UUID: %v, Error: %v", uuid, err)})
 	}
 
 	msg := fmt.Sprintf("User with id %v was deleted from the Database.", uuid)

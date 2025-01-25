@@ -12,12 +12,17 @@ import (
 const boltStoreName = "bunny"
 
 // Logger middleware configuration
+
+var formatVerbose = `{"time":"${time_rfc3339_nano}", "status":${status}, "remote_ip":"${remote_ip}", ` +
+	`"method":"${method}", "host":"${host}", "uri":"${uri}", "user_agent":"${user_agent}",` +
+	`"latency":${latency}, "latency_human":"${latency_human}",` +
+	`"bytes_in":${bytes_in}, "bytes_out":${bytes_out}, "error":"${error}"}` + "\n"
+
+var format = `${method} ${status} ${uri}. Error: "${error}"` + "\n"
+
 var CustomLoggerConfig = middleware.LoggerConfig{
-	Skipper: middleware.DefaultSkipper,
-	Format: `{"time":"${time_rfc3339_nano}", "status":${status}, "remote_ip":${remote_ip}, "` +
-		`"method":"${method}", "host":"${host}", "uri":"${uri}", "user_agent":"${user_agent}",` +
-		`"latency":${latency},"latency_human":"${latency_human}"` +
-		`,"bytes_in":${bytes_in},"bytes_out":${bytes_out}},"error":"${error}"}` + "\n",
+	Skipper:          middleware.DefaultSkipper,
+	Format:           format,
 	CustomTimeFormat: "2006-01-02 15:04:05.00000",
 }
 
@@ -39,12 +44,14 @@ func (s *ServerBU) StartServer() error {
 
 	e := echo.New()
 
+	e.Static("/static", "static")
+
 	e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
 	e.Use(RealIPMiddleware)
 	e.PUT("/put/:name/:role/:age", s.handlePut)
 	e.GET("/get/:id", s.handleGet)
 	e.GET("/getAll", s.handleGetAll)
-	e.DELETE("/delete/:id", s.handleDelete)
+	e.POST("/delete/:id", s.handleDelete)
 
 	return e.Start(s.laddr)
 }
