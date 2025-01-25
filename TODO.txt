@@ -1,0 +1,4 @@
+- Think more about generics
+- Autoincrement in db index, or UUID
+- Middleware, auth and loggs
+- Templates
