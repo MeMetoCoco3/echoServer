@@ -7,22 +7,26 @@ import (
 )
 
 type User struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
-	Role string    `json:"role"`
-	Age  int       `json:"age"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name" validate:"required"`
+	Role        string    `json:"role" validate:"required"`
+	Age         int       `json:"age" validate:"required"`
+	Email       string    `json:"email" validate:"required"`
+	Description string    `json:"description" validate:"required"`
 }
 
-func NewUser(name, role string, age int) (uuid.UUID, *User, error) {
+func NewUser(name, role, email string, age int) (uuid.UUID, *User, error) {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		return uuid, nil, fmt.Errorf("Could not create UUID: %v", err)
 	}
 	return uuid, &User{
-		ID:   uuid,
-		Name: name,
-		Role: role,
-		Age:  age,
+		ID:          uuid,
+		Name:        name,
+		Role:        role,
+		Age:         age,
+		Email:       email,
+		Description: "No description... YET!!",
 	}, nil
 }
 

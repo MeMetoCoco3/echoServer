@@ -1,4 +1,5 @@
-- Think more about generics
-- Autoincrement in db index, or UUID
+- Maybe use middleware to parse and validate data
 - Middleware, auth and loggs
-- Templates
+- pages for every endpoint
+- more complete users, with picture at least
+- update

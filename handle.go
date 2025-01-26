@@ -1,8 +1,7 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	_ "encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,8 +19,14 @@ func (s *ServerBU) handlePut(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": err})
 
 	}
+	// TODO
+	defaultEmail := "robocop@gmail.com"
+	uuid, newUser, err := NewUser(name, role, defaultEmail, age)
 
-	uuid, newUser, err := NewUser(name, role, age)
+	err = c.Validate(newUser)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]error{"msg": err})
+	}
 
 	s.Storage.Put(uuid.String(), *newUser)
 	msg := fmt.Sprintf("Transaction completed: Added User{'name':'%v','age':%v,'role':'%v'}", name, age, role)
@@ -39,12 +44,18 @@ func (s *ServerBU) handleGet(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": err})
 	}
 
-	userBytes, err := json.Marshal(user)
+	//userBytes, err := json.Marshal(user)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": err})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{"user": json.RawMessage(userBytes)})
+	templateName := "GetUser.html"
+	log.Println("Rendering template:, ", templateName)
+	if err = c.Render(http.StatusOK, templateName, user); err != nil {
+		log.Println(err)
+	}
+	return err
+	//return c.JSON(http.StatusOK, map[string]interface{}{"user": json.RawMessage(userBytes)})
 }
 
 func (s *ServerBU) handleGetAll(c echo.Context) error {
@@ -53,15 +64,12 @@ func (s *ServerBU) handleGetAll(c echo.Context) error {
 		log.Println("Error fetching all users:", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"msg": "Error fetching users"})
 	}
-
-	var buff bytes.Buffer
-
-	err = GetAllUsers.Execute(&buff, users)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": err})
+	templateName := "GetAllUsers.html"
+	log.Println("Rendering template:, ", templateName)
+	if err = c.Render(http.StatusOK, templateName, users); err != nil {
+		log.Println(err)
 	}
-
-	return c.HTMLBlob(http.StatusOK, buff.Bytes())
+	return err
 }
 
 func (s *ServerBU) handleDelete(c echo.Context) error {
