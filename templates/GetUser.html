@@ -1,102 +1,108 @@
-
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User: {{ .Name }}</title>
-        <link rel="stylesheet" href="/static/style.css">
-        <link rel="icon" href="/static/favicon.ico">
-        <style>
-            .card {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User: {{ .Name }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/favicon.ico">
+    <style>
+        h1 {
+
+            width: 750px;
+            padding: 0px;
+            margin: 0px;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            border-style: solid solid none solid;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        .card {
             display: flex;
             align-items: center;
-            width: 500px;
+            width: 750px;
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            border: 1px solid black;
+            border-style: none solid solid solid;
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
             overflow: hidden;
-            }
-            .card h1{
+        }
+        .card h1 {
             padding: 20px;
             margin: 0px;
             font-size: 2em;
             width: 200px;
             height: 20px;
-            }
-            .card .profile-img {
+        }
+        .card .profile-img {
             border-radius: 3px;
             margin-left: 30px;
             border: 2px solid red;
             width: 170px;
             height: 170px;
             object-fit: cover;
-            }
-            .edit-img {
-    		display: inline;
+        }
+        .edit-img {
+            display: inline;
             border: 1px solid black;
             height: 20px;
             width: 20px;
-
-            }
-            .card-content {
+        }
+        .card-content {
             padding: 16px;
-            }
-            .card-content p {
+        }
+        .card-content p {
             color: #666;
-            }
-            .card-content .email {
+            display: flex; /* Use Flexbox */
+            align-items: center; /* Vertically center the items */
+            gap: 10px; /* Add space between the items */
+        }
+        .card-content .email {
             text-decoration: none;
             color: #007bff;
-            }
-            .card-content .email a:hover {
+        }
+        .card-content .email a:hover {
             text-decoration: underline;
-            }
-        </style>
-    </head>
-    <body>
-        <header>
-            <div class="nav-container">
-                <img src="/static/logo1.png" alt="Logo" class="logo">
-                <nav>
-                    <ul class="nav-links">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
-        <body>
-            <div class="card">
-                <img class="profile-img" src="/static/profile1.jpg" alt="User Image">
-                <div class="card-content">
-                    <h1>{{ .Name }}</h1>
-                    <p><strong>Role:</strong> {{ .Role }} 
-                    <form action="/delete/{{ .ID }}" method="POST" class="delete-form">
-                        <input class="edit-img" type="image" src="/static/edit_icon.png">
-                    </form>
-                    </p>
-                    <p><strong>Age:</strong> {{ .Age }} 
-                    <form action="/delete/{{ .ID }}" method="POST" class="delete-form">
-                        <input class="edit-img" type="image" src="/static/edit_icon.png">
-                    </form>
-                    </p>
-                    <p><strong>Email:</strong> <a class="email" href="mailto:{{ .Email }}">{{ .Email }}</a> 
-                    <form action="/delete/{{ .ID }}" method="POST" class="delete-form">
-                       
-                        <input class="edit-img" type="image" src="/static/edit_icon.png">
-                    </form>
-                    </p>
-                    <p><strong>Description: </strong> 
-                        {{ if .Description }}{{ .Description }}{{ else }}No description available.{{ end }}  
-                    <form action="/delete/{{ .ID }}" method="POST" class="delete-form">
-                        <input class="edit-img" type="image" src="/static/edit_icon.png">
-                    </form>
-                    </p>
-                </div>
-            </div>
-    </body>
-    </body>
-</html>
+        }
+        .edit-form {
+            display: inline-block; /* Make the form inline */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
 
+    </style>
+</head>
+<body>
+  {{ template "header.html" . }}
+
+  <h1>{{ .Name }}</h1>
+  <div class="card">
+    <img class="profile-img" src="/static/profile1.jpg" alt="User Image">
+    <div class="card-content">
+      <form>
+        <p>
+          <strong>Role:</strong> <span id="role">{{ .Role }}</span>
+          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'role', {{ .ID }})">
+        </p>
+        <p>
+          <strong>Age:</strong> <span id="age">{{ .Age }}</span>
+          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'age', {{ .ID }})">
+        </p>
+        <p>
+          <strong>Email:</strong> <span id="email">{{ .Email }}</span>
+          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'email', {{ .ID }})">
+        </p>
+        <p>
+          <strong>Description:</strong> <span id="description">{{ if .Description }}{{ .Description }}{{ else }}No description available.{{ end }}</span>
+                        <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'description', {{ .ID }})">
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+
+</body>

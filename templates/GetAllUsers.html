@@ -8,20 +8,7 @@
         <link rel="icon" href="/static/favicon.ico" >
 </head>
 <body>
-    <header>
-
-    <div class="nav-container">
-        <img src="/static/logo1.png" alt="Logo" class="logo">
-        <nav>
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-        </nav>
-    </div>
-    </header>
-
+        {{ template "header.html" .}}
     <main>
             <h1>Users Table</h1>
     <table>

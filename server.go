@@ -70,6 +70,11 @@ func (s *ServerBU) StartServer() error {
 	e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
 	e.Use(RealIPMiddleware)
 
+	e.GET("/about", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "about.html", nil)
+	})
+
+	e.POST("/update/:id/:field", s.handleUpdateUserData)
 	e.PUT("/put/:name/:role/:age", s.handlePut)
 	e.GET("/get/:id", s.handleGet)
 	e.GET("/getAll", s.handleGetAll)

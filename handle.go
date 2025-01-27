@@ -90,3 +90,40 @@ func (s *ServerBU) handleDelete(c echo.Context) error {
 	msg := fmt.Sprintf("User with id %v was deleted from the Database.", uuid)
 	return c.JSON(http.StatusOK, map[string]string{"msg": msg})
 }
+
+func (s *ServerBU) handleUpdateUserData(c echo.Context) error {
+	field := c.Param("field")
+	id := c.Param("id")
+	var info struct {
+		Value string `json:"value"`
+	}
+	if err := c.Bind(&info); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]error{"err": err})
+	}
+
+	user, err := s.Storage.Get(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]error{"err": err})
+	}
+	switch field {
+	case "role":
+		user.Role = info.Value
+	case "age":
+		ageVal, err := strconv.Atoi(info.Value)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]error{"err": err})
+		}
+		user.Age = ageVal
+	case "email":
+		user.Email = info.Value
+	case "description":
+		user.Description = info.Value
+	}
+
+	err = s.Storage.Put(id, user)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]error{"err": err})
+	}
+	return c.JSON(http.StatusOK, map[string]bool{"success": true})
+
+}

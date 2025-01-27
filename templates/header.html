@@ -1,15 +1,56 @@
 <!-- templates/header.html -->
 <style>
+.nav-container {
+    width: 90%;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
+.logo {
+    height: 80px; 
+}
+
+.nav-links {
+    display: flex; 
+    gap: 20px;
+}
+
+.nav-links li {
+    display: inline;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: black;
+    font-size: 24px;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    background-color: #899878;
+    border-radius: 5px;
+}
+
+
+.edit-btn{
+    height: 10px;
+    width: 10px;
+
+    }
 </style>
 
+<header>
       <div class="nav-container">
         <img src="/static/logo1.png" alt="Logo" class="logo">
         <nav>
           <ul class="nav-links">
             <li><a href="/getAll">Home</a></li>
-            <li><a href="/getAll">About</a></li>
+            <li><a href="/about">About</a></li>
             <li><a href="/getAll">Contact</a></li>
           </ul>
         </nav>
       </div>
+</header>
