@@ -31,8 +31,9 @@ var CustomLoggerConfig = middleware.LoggerConfig{
 
 type (
 	ServerBU struct {
-		laddr   string
-		Storage Storer[string, User]
+		laddr      string
+		Storage    Storer[string, User]   // uuid to User
+		EmailIndex Storer[string, string] // email to uuid
 	}
 
 	CustomValidator struct {
@@ -44,10 +45,11 @@ type (
 	}
 )
 
-func NewServerBU(laddr string, store Storer[string, User]) (*ServerBU, error) {
+func NewServerBU(laddr string, store Storer[string, User], emailIndex Storer[string, string]) (*ServerBU, error) {
 	return &ServerBU{
-		laddr:   laddr,
-		Storage: store,
+		laddr:      laddr,
+		Storage:    store,
+		EmailIndex: emailIndex,
 	}, nil
 }
 
@@ -57,27 +59,24 @@ func (s *ServerBU) StartServer() error {
 
 	e := echo.New()
 
-	e.Validator = CustomValidator{Validator: validator.New()}
-
 	templates := template.Must(template.ParseGlob("templates/*.html"))
 	t := &Template{
 		templates: templates,
 	}
 	e.Renderer = t
 
-	e.Static("/static", "static")
-
+	e.Validator = CustomValidator{Validator: validator.New()}
 	e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
 	e.Use(RealIPMiddleware)
 
+	e.Static("/static", "static")
 	e.GET("/about", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "about.html", nil)
 	})
-
-	e.POST("/update/:id/:field", s.handleUpdateUserData)
-	e.PUT("/put/:name/:role/:age", s.handlePut)
 	e.GET("/get/:id", s.handleGet)
 	e.GET("/getAll", s.handleGetAll)
+	e.PUT("/put/:name/:role/:age", s.handlePut)
+	e.POST("/update/:id/:field", s.handleUpdateUserData)
 	e.POST("/delete/:id", s.handleDelete)
 
 	return e.Start(s.laddr)

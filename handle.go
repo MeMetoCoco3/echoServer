@@ -13,6 +13,8 @@ import (
 func (s *ServerBU) handlePut(c echo.Context) error {
 	name := c.Param("name")
 	role := c.Param("role")
+	//email := c.Param("email")
+	defaultEmail := "robocop@gmail.com"
 
 	age, err := strconv.Atoi(c.Param("age"))
 	if err != nil {
@@ -20,7 +22,6 @@ func (s *ServerBU) handlePut(c echo.Context) error {
 
 	}
 	// TODO
-	defaultEmail := "robocop@gmail.com"
 	uuid, newUser, err := NewUser(name, role, defaultEmail, age)
 
 	err = c.Validate(newUser)
@@ -29,6 +30,7 @@ func (s *ServerBU) handlePut(c echo.Context) error {
 	}
 
 	s.Storage.Put(uuid.String(), *newUser)
+	s.EmailIndex.Put(defaultEmail, uuid.String())
 	msg := fmt.Sprintf("Transaction completed: Added User{'name':'%v','age':%v,'role':'%v'}", name, age, role)
 	return c.JSON(http.StatusOK, map[string]string{"msg": msg})
 }
@@ -81,8 +83,15 @@ func (s *ServerBU) handleDelete(c echo.Context) error {
 	if uuid == "" {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": fmt.Errorf("Id was not introduced")})
 	}
-
-	err := s.Storage.Delete(uuid)
+	userInfo, err := s.Storage.Get(uuid)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": fmt.Errorf("Id was not introduced")})
+	}
+	err = s.EmailIndex.Delete(userInfo.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": fmt.Errorf("Id was not introduced")})
+	}
+	err = s.Storage.Delete(uuid)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": fmt.Errorf("UUID: %v, Error: %v", uuid, err)})
 	}
@@ -115,7 +124,15 @@ func (s *ServerBU) handleUpdateUserData(c echo.Context) error {
 		}
 		user.Age = ageVal
 	case "email":
-		user.Email = info.Value
+		if userData, err := s.Storage.Get(id); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]error{"err": err})
+		} else {
+			user.Email = info.Value
+			err = s.EmailIndex.Delete(userData.Email)
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, map[string]error{"err": err})
+			}
+		}
 	case "description":
 		user.Description = info.Value
 	}
@@ -124,6 +141,9 @@ func (s *ServerBU) handleUpdateUserData(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]error{"err": err})
 	}
+
+	err = s.EmailIndex.Put(user.Email, id)
+
 	return c.JSON(http.StatusOK, map[string]bool{"success": true})
 
 }
