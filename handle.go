@@ -13,6 +13,7 @@ import (
 func (s *ServerBU) handlePut(c echo.Context) error {
 	name := c.Param("name")
 	role := c.Param("role")
+	password := c.Param("password")
 	//email := c.Param("email")
 	defaultEmail := "robocop@gmail.com"
 
@@ -21,8 +22,7 @@ func (s *ServerBU) handlePut(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]error{"msg": err})
 
 	}
-	// TODO
-	uuid, newUser, err := NewUser(name, role, defaultEmail, age)
+	uuid, newUser, err := NewUser(name, role, defaultEmail, password, age)
 
 	err = c.Validate(newUser)
 	if err != nil {
@@ -31,7 +31,7 @@ func (s *ServerBU) handlePut(c echo.Context) error {
 
 	s.Storage.Put(uuid.String(), *newUser)
 	s.EmailIndex.Put(defaultEmail, uuid.String())
-	msg := fmt.Sprintf("Transaction completed: Added User{'name':'%v','age':%v,'role':'%v'}", name, age, role)
+	msg := fmt.Sprintf("Transaction completed: Added User{'name':'%v','age':%v,'role':'%v', 'password': '%v'}", name, age, role, password)
 	return c.JSON(http.StatusOK, map[string]string{"msg": msg})
 }
 

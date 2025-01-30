@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"log"
 	"reflect"
 	"strconv"
+
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -19,11 +21,17 @@ type User struct {
 	Password    string    `json:"password"`
 }
 
-func NewUser(name, role, email string, age int) (uuid.UUID, *User, error) {
+func NewUser(name, role, email, password string, age int) (uuid.UUID, *User, error) {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		return uuid, nil, fmt.Errorf("Could not create UUID: %v", err)
 	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+
+	if err != nil {
+		return uuid, nil, fmt.Errorf("Could not hash the password: %v", err)
+	}
+
 	return uuid, &User{
 		ID:          uuid,
 		Name:        name,
@@ -31,7 +39,7 @@ func NewUser(name, role, email string, age int) (uuid.UUID, *User, error) {
 		Age:         age,
 		Email:       email,
 		Description: "No description... YET!!",
-		Password:    "1234",
+		Password:    string(hashedPassword),
 	}, nil
 }
 

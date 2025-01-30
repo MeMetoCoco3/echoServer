@@ -79,7 +79,7 @@ func (s *ServerBU) StartServer() error {
 	e.GET("/get/:id", s.handleGet)
 	e.GET("/getAll", s.handleGetAll)
 	e.GET("/register", s.handleLogInGet)
-	//e.POST("/register", s.handleRegistration)
+	e.POST("/register", s.handleRegister)
 	e.POST("/login", s.handleLogInPost)
 	e.PUT("/put/:name/:role/:age", s.handlePut)
 	e.POST("/update/:id/:field", s.handleUpdateUserData)

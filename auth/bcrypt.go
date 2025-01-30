@@ -6,6 +6,9 @@ import (
 )
 
 func main() {
+
+	log.Println(7 / 2)
+
 	log.Println("start")
 	password := []byte("UnPassRandom123")
 	password2 := []byte("OtroPassjj")

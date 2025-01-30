@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *ServerBU) handleLogInGet(c echo.Context) error {
@@ -13,12 +14,8 @@ func (s *ServerBU) handleLogInGet(c echo.Context) error {
 }
 
 func (s *ServerBU) handleLogInPost(c echo.Context) error {
-
-	log.Println("Login start")
-	// TODO: Bcrypt over here! and on user creation
 	email := c.FormValue("email")
 	pass := c.FormValue("password")
-	log.Println(email)
 	uuid, err := s.EmailIndex.Get(email)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"msg": "Email not found!"})
@@ -29,11 +26,29 @@ func (s *ServerBU) handleLogInPost(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"msg": "User does not have a password"})
 	}
 
-	if pass != savedPassword["Password"] {
+	err = bcrypt.CompareHashAndPassword([]byte(savedPassword["Password"]), []byte(pass))
+	if err != nil {
 		return c.JSON(http.StatusConflict, map[string]string{"msg": "Password does not match"})
 	}
 
-	log.Println("Login finish")
 	return c.JSON(http.StatusOK, map[string]string{"msg": "Log in good!"})
+}
 
+func (s *ServerBU) handleRegister(c echo.Context) error {
+	// TODO: We expect every value is valid
+	email := c.FormValue("email")
+	pass := c.FormValue("password")
+	username := c.FormValue("username")
+
+	uuid, u, err := NewUser(username, "default", email, pass, 0)
+	if err != nil {
+		return c.JSON(http.StatusConflict, map[string]string{"msg": "Error creating user"})
+	}
+
+	err = s.Storage.Put(uuid.String(), *u)
+	if err != nil {
+		return c.JSON(http.StatusConflict, map[string]string{"msg": "Error putting user"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"msg": fmt.Sprintf("User %v was registered!!", username)})
 }

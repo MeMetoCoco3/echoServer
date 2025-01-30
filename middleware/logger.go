@@ -39,10 +39,36 @@ func ResponseLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		method := c.Request().Method
 		path := c.Path()
 		status := crw.status
+
 		responseBody := crw.body.String()
+
+		if isTemplate(responseBody) {
+			responseBody = "<!DOCTYPE html>"
+		}
 
 		log.Printf("Client IP: %s | %s %d %s | Response: %s\n", clientIP, method, status, path, responseBody)
 
 		return err
 	}
+}
+
+func isTemplate(respose string) bool {
+	label := "<!DOCTYPE html>"
+	ptrLabel := 0
+	resposeLen := len(respose)
+	if resposeLen == 0 {
+		return false
+	}
+
+	for i := 0; i < resposeLen/10; i++ {
+		if respose[i] == label[ptrLabel] {
+			ptrLabel++
+			if ptrLabel == len(label) {
+				return true
+			}
+			continue
+		}
+		ptrLabel = 0
+	}
+	return false
 }

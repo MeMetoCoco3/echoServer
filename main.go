@@ -3,11 +3,18 @@ package main
 import (
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	os.Remove(pathUsers)
 	os.Remove(pathEmailIndex)
+
+	err := godotenv.Load()
+	mySecretKey := os.Getenv("SECRET_KEY")
+
+	log.Println(mySecretKey)
 
 	storeU, err := NewBoltStore[string, User](pathUsers, bucketUsersName)
 	storeE, err := NewBoltStore[string, string](pathEmailIndex, bucketEmailName)
@@ -16,13 +23,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	id1, u1, err := NewUser("Vidal", "Maquine", "doneskroto@gmail.com", 12)
+	id1, u1, err := NewUser("Vidal", "Maquine", "doneskroto@gmail.com", "1234", 12)
 
-	id2, u2, err := NewUser("Katerina", "Principesa", "kata@gmail.com", 23)
-	id3, u3, err := NewUser("Mare", "Reina", "Mare@gmail.com", 34)
-	id4, u4, err := NewUser("Pare", "The fucking king", "Pare@gmail.com", 12)
-	id5, u5, err := NewUser("Hermano", "Maquine", "germa@gmail.com", 12)
-	id6, u6, err := NewUser("El abuelo Vidal", "Legend of the game", "AbueloVidal@gmail.com", 12)
+	id2, u2, err := NewUser("Katerina", "Principesa", "kata@gmail.com", "4321", 23)
+	id3, u3, err := NewUser("Mare", "Reina", "Mare@gmail.com", "0987", 34)
+	id4, u4, err := NewUser("Pare", "The fucking king", "Pare@gmail.com", "123412", 12)
+	id5, u5, err := NewUser("Hermano", "Maquine", "germa@gmail.com", "6234", 12)
+	id6, u6, err := NewUser("El abuelo Vidal", "Legend of the game", "AbueloVidal@gmail.com", "09123", 12)
 	log.Println(id1)
 	storeU.Put(id1.String(), *u1)
 	storeE.Put(u1.Email, id1.String())
@@ -40,7 +47,7 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println(m)
+
 	for k, v := range m {
 		log.Printf("For K %v, we got %v", k, v)
 	}
