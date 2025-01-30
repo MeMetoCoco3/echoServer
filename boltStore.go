@@ -17,6 +17,7 @@ type Storer[K comparable, V any] interface {
 	Update(K, V) error
 	Delete(K) error
 	GetAll() (map[K]V, error)
+	GetValues(key K, values []K) (map[K]string, error)
 }
 
 var bucketUsersName = "users_collection"

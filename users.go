@@ -16,6 +16,7 @@ type User struct {
 	Age         int       `json:"age" validate:"required"`
 	Email       string    `json:"email" validate:"required"`
 	Description string    `json:"description" validate:"required"`
+	Password    string    `json:"password"`
 }
 
 func NewUser(name, role, email string, age int) (uuid.UUID, *User, error) {
@@ -30,6 +31,7 @@ func NewUser(name, role, email string, age int) (uuid.UUID, *User, error) {
 		Age:         age,
 		Email:       email,
 		Description: "No description... YET!!",
+		Password:    "1234",
 	}, nil
 }
 

@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-playground/validator"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	cMiddleware "github.com/MeMetoCoco3/echoServer/middleware"
+	"github.com/go-playground/validator"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 const boltStoreName = "bunny"
@@ -55,7 +57,7 @@ func NewServerBU(laddr string, store Storer[string, User], emailIndex Storer[str
 
 func (s *ServerBU) StartServer() error {
 
-	log.Println("Starting server on: %s.", s.laddr)
+	log.Printf("Starting server on: %v.", s.laddr)
 
 	e := echo.New()
 
@@ -66,7 +68,8 @@ func (s *ServerBU) StartServer() error {
 	e.Renderer = t
 
 	e.Validator = CustomValidator{Validator: validator.New()}
-	e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
+	//e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
+	e.Use(cMiddleware.ResponseLogger)
 	e.Use(RealIPMiddleware)
 
 	e.Static("/static", "static")
@@ -75,6 +78,9 @@ func (s *ServerBU) StartServer() error {
 	})
 	e.GET("/get/:id", s.handleGet)
 	e.GET("/getAll", s.handleGetAll)
+	e.GET("/register", s.handleLogInGet)
+	//e.POST("/register", s.handleRegistration)
+	e.POST("/login", s.handleLogInPost)
 	e.PUT("/put/:name/:role/:age", s.handlePut)
 	e.POST("/update/:id/:field", s.handleUpdateUserData)
 	e.POST("/delete/:id", s.handleDelete)

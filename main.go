@@ -36,7 +36,7 @@ func main() {
 	storeE.Put(u5.Email, id5.String())
 	storeU.Put(id6.String(), *u6)
 	storeE.Put(u6.Email, id6.String())
-	m, err := storeU.GetValues(id4.String(), []string{"Age", "Email", "Name", "ID", "Role"})
+	m, err := storeU.GetValues(id4.String(), []string{"Age", "Email", "Name", "ID", "Role", "Password"})
 	if err != nil {
 		log.Println(err)
 	}
@@ -64,16 +64,15 @@ func main() {
 	   		log.Println(vidalUser)
 	   	}
 
-	   	server, err := NewServerBU(":1337", storeU, storeE)
-	   	if err != nil {
-	   		log.Println(err)
-	   		os.Exit(1)
-	   	}
-	   	   log.Println(store.Get(id3.String()))
-
-	   	   	if err = server.StartServer(); err != nil {
-	   	   		log.Println("We got some errors: ", err)
-
-	   	   }
 	*/
+	server, err := NewServerBU(":1337", storeU, storeE)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+
+	if err = server.StartServer(); err != nil {
+		log.Println("We got some errors: ", err)
+
+	}
 }
