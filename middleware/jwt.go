@@ -2,20 +2,41 @@ package cMiddleware
 
 import (
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
+	"strings"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
 )
 
-func MakeJWT(userID, tokenSecret string, expiresIn time.Duration) (string, error) {
+type TokenParams struct {
+	SignedString string
+	UserID       string
+	ExpiresAt    time.Time
+}
+
+func MakeJWT(userID, tokenSecret string, expiresIn time.Duration) (*TokenParams, error) {
+	now := time.Now()
+	expirationTime := now.Add(expiresIn)
+
 	claims := jwt.RegisteredClaims{
 		Issuer:    "VidalTM",
 		Subject:   userID,
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresIn)),
+		IssuedAt:  jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(expirationTime),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString(tokenSecret)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedString, err := token.SignedString(tokenSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TokenParams{
+		SignedString: signedString,
+		UserID:       userID,
+		ExpiresAt:    expirationTime,
+	}, nil
 }
 
 func ValidateJWT(tokenString, tokenSecret string) (string, error) {
@@ -32,4 +53,25 @@ func ValidateJWT(tokenString, tokenSecret string) (string, error) {
 	}
 
 	return token.Claims.GetSubject()
+}
+
+func OptionalJWT(secretKey []byte) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			authHeader := c.Request().Header.Get("Authorization")
+			if authHeader != "" {
+				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+				if tokenString != "" {
+
+					token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+						return secretKey, nil
+					})
+					if err == nil && token.Valid {
+						c.Set("user", token)
+					}
+				}
+			}
+			return next(c)
+		}
+	}
 }

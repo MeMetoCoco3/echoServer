@@ -6,10 +6,13 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	cMiddleware "github.com/MeMetoCoco3/echoServer/middleware"
 	"github.com/go-playground/validator"
+	"github.com/joho/godotenv"
+	_ "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -36,6 +39,7 @@ type (
 		laddr      string
 		Storage    Storer[string, User]   // uuid to User
 		EmailIndex Storer[string, string] // email to uuid
+		secretKey  string
 	}
 
 	CustomValidator struct {
@@ -48,17 +52,24 @@ type (
 )
 
 func NewServerBU(laddr string, store Storer[string, User], emailIndex Storer[string, string]) (*ServerBU, error) {
+	err := godotenv.Load()
+	if err != nil {
+		return nil, err
+	}
+	secretKey := os.Getenv("SECRET_KEY")
+	if secretKey == "" {
+		return nil, fmt.Errorf("No key was found as envVar")
+	}
+
 	return &ServerBU{
 		laddr:      laddr,
 		Storage:    store,
 		EmailIndex: emailIndex,
+		secretKey:  secretKey,
 	}, nil
 }
 
 func (s *ServerBU) StartServer() error {
-
-	log.Printf("Starting server on: %v.", s.laddr)
-
 	e := echo.New()
 
 	templates := template.Must(template.ParseGlob("templates/*.html"))
@@ -68,9 +79,10 @@ func (s *ServerBU) StartServer() error {
 	e.Renderer = t
 
 	e.Validator = CustomValidator{Validator: validator.New()}
-	//e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
 	e.Use(cMiddleware.ResponseLogger)
-	e.Use(RealIPMiddleware)
+	e.Use(cMiddleware.RealIP)
+	e.Use(cMiddleware.OptionalJWT([]byte(s.secretKey)))
+	//e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
 
 	e.Static("/static", "static")
 	e.GET("/about", func(c echo.Context) error {

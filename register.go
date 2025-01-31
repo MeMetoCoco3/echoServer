@@ -3,17 +3,24 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	cMiddleware "github.com/MeMetoCoco3/echoServer/middleware"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *ServerBU) handleLogInGet(c echo.Context) error {
-	return c.Render(http.StatusOK, "logIn.html", nil)
+	res := &Response{IsLoggedIn: false}
+	SetIsLogged(c.Get("user"), res)
 
+	return c.Render(http.StatusOK, "login.html", res)
 }
 
 func (s *ServerBU) handleLogInPost(c echo.Context) error {
+	res := &Response{IsLoggedIn: false}
+	SetIsLogged(c.Get("user"), res)
+
 	email := c.FormValue("email")
 	pass := c.FormValue("password")
 	uuid, err := s.EmailIndex.Get(email)
@@ -30,11 +37,18 @@ func (s *ServerBU) handleLogInPost(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusConflict, map[string]string{"msg": "Password does not match"})
 	}
+	t, err := cMiddleware.MakeJWT(uuid, s.secretKey, time.Duration(time.Minute*2))
+	if err != nil {
+		return c.JSON(http.StatusConflict, map[string]string{"msg": "Error generating token"})
+	}
 
-	return c.JSON(http.StatusOK, map[string]string{"msg": "Log in good!"})
+	return c.JSON(http.StatusOK, map[string]string{"token": t.SignedString})
 }
 
 func (s *ServerBU) handleRegister(c echo.Context) error {
+	res := &Response{IsLoggedIn: false}
+	SetIsLogged(c.Get("user"), res)
+
 	// TODO: We expect every value is valid
 	email := c.FormValue("email")
 	pass := c.FormValue("password")

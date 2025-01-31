@@ -49,7 +49,11 @@
           <ul class="nav-links">
             <li><a href="/getAll">Home</a></li>
             <li><a href="/about">About</a></li>
-            <li><a href="/register">LogIn</a></li>
+            {{ if .IsLoggedIn }}
+                <li><a href="/register">Log Out</a></li>
+            {{ else }}
+                <li><a href="/register">Log In</a></li>
+            {{ end }}
           </ul>
         </nav>
       </div>

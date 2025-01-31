@@ -8,7 +8,8 @@ import (
 )
 
 type CustomResponseWriter struct {
-	http.ResponseWriter               // Embed original ResponseWriter
+	http.ResponseWriter // Embed original ResponseWriter
+	header              *bytes.Buffer
 	body                *bytes.Buffer // Ready to capture body and status
 	status              int
 }
@@ -46,7 +47,7 @@ func ResponseLogger(next echo.HandlerFunc) echo.HandlerFunc {
 			responseBody = "<!DOCTYPE html>"
 		}
 
-		log.Printf("Client IP: %s | %s %d %s | Response: %s\n", clientIP, method, status, path, responseBody)
+		log.Printf("Client IP: %s | %s %d %s | \nHeader: %s\nResponse: %s\n ", clientIP, method, status, path, c.Request().Header, responseBody)
 
 		return err
 	}

@@ -12,13 +12,14 @@ import (
 )
 
 type User struct {
-	ID          uuid.UUID `json:"id"`
-	Name        string    `json:"name" validate:"required"`
-	Role        string    `json:"role" validate:"required"`
-	Age         int       `json:"age" validate:"required"`
-	Email       string    `json:"email" validate:"required"`
-	Description string    `json:"description" validate:"required"`
-	Password    string    `json:"password"`
+	ID          uuid.UUID   `json:"id"`
+	Name        string      `json:"name" validate:"required"`
+	Role        string      `json:"role" validate:"required"`
+	Age         int         `json:"age" validate:"required"`
+	Email       string      `json:"email" validate:"required"`
+	Description string      `json:"description" validate:"required"`
+	Password    string      `json:"password"`
+	Token       interface{} `json:"token"`
 }
 
 func NewUser(name, role, email, password string, age int) (uuid.UUID, *User, error) {

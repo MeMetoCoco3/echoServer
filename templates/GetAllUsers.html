@@ -20,7 +20,7 @@
             <th>Edit</th>
             <th>Delete</th>
         </tr>
-        {{ range . }}
+        {{ range .Content }}
         <tr>
             <td class="uuid-td">{{ .ID }}</td>
             <td><b>{{ .Name }}</b></td>
@@ -42,6 +42,6 @@
     </table>
 
     </main>
-
+    {{ template "footer.html" .}}
 </body>
 </html>

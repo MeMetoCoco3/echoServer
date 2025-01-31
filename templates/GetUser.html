@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User: {{ .Name }}</title>
+    <title>User: {{ .Content.Name }}</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="/static/favicon.ico">
     <style>
@@ -78,31 +78,31 @@
 <body>
   {{ template "header.html" . }}
 
-  <h1>{{ .Name }}</h1>
+  <h1>{{ .Content.Name }}</h1>
   <div class="card">
     <img class="profile-img" src="/static/profile1.jpg" alt="User Image">
     <div class="card-content">
       <form>
         <p>
-          <strong>Role:</strong> <span id="role">{{ .Role }}</span>
-          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'role', {{ .ID }})">
+          <strong>Role:</strong> <span id="role">{{ .Content.Role }}</span>
+          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'role', {{ .Content.ID }})">
         </p>
         <p>
-          <strong>Age:</strong> <span id="age">{{ .Age }}</span>
-          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'age', {{ .ID }})">
+          <strong>Age:</strong> <span id="age">{{ .Content.Age }}</span>
+          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'age', {{ .Content.ID }})">
         </p>
         <p>
-          <strong>Email:</strong> <span id="email">{{ .Email }}</span>
-          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'email', {{ .ID }})">
+          <strong>Email:</strong> <span id="email">{{ .Content.Email }}</span>
+          <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'email', {{ .Content.ID }})">
         </p>
         <p>
-          <strong>Description:</strong> <span id="description">{{ if .Description }}{{ .Description }}{{ else }}No description available.{{ end }}</span>
-                        <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'description', {{ .ID }})">
+          <strong>Description:</strong> <span id="description">{{ if .Content.Description }}{{ .Content.Description }}{{ else }}No description available.{{ end }}</span>
+                        <input class="edit-img" type="image" src="/static/edit_icon.png" onclick="editField(event, 'description', {{ .Content.ID }})">
         </p>
       </form>
     </div>
   </div>
-
+    {{ template "footer.html" .}}
   <script src="/static/script.js"></script>
 
 </body>

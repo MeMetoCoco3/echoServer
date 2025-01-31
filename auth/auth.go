@@ -104,6 +104,7 @@ func HashMessage(message string) []byte {
 }
 
 // https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims
+// deprecated
 func MakeJWT(userID string, timeExpire time.Duration) (string, error) {
 	ec := NewEllipticCurve(elliptic.P256())
 	priv, _, _ := ec.GenerateKeys()
@@ -112,7 +113,7 @@ func MakeJWT(userID string, timeExpire time.Duration) (string, error) {
 		jwt.MapClaims{
 			"iss": "echoServer",
 			"sub": "sub",
-			"exp": time.Now().Add(time.Duration(timeExpire)),
+			"exp": time.Now().Add(time.Hour * 24).Unix(),
 		},
 	)
 
