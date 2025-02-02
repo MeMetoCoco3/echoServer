@@ -65,12 +65,35 @@ function saveField(fieldId, inputElement, userID) {
 const originalFetch = window.fetch; // save original fetch so we can still use it as original fetch
 window.fetch = async function(url, options={}){
   const token = localStorage.getItem('token');
-  const headers = options.headers || {}; 
+ 
+  if (!options.headers) {
+      options.headers = new Headers();
+  } else if (!(options.headers instanceof Headers)) {
+      options.headers = new Headers(options.headers);
+  }
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    console.log("Token inside of :", token)
+    options.headers.set('Authorization', `Bearer ${token}`);
   }
   
-  return originalFetch(url, {...options, headers});
+  return originalFetch(url, options);
 };
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const authLink = document.getElementById("auth-link");
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        // If logged in, show "Logout" link
+        authLink.innerHTML = '<a href="#" id="logout-btn">Logout</a>';
+        // Event listener for logout
+        document.getElementById("logout-btn").addEventListener("click", function (event) {
+            event.preventDefault();
+            localStorage.removeItem("token");  // Clear token
+            location.reload();  // Refresh to reflect changes
+        });
+    }
+});
 

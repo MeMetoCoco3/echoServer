@@ -25,12 +25,12 @@ func (s *ServerBU) handleLoginPost(c echo.Context) error {
 	pass := c.FormValue("password")
 	uuid, err := s.EmailIndex.Get(email)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"msg": "Email not found!"})
+		return c.JSON(http.StatusNotFound, map[string]string{"msg": fmt.Sprintf("Email not found!: %v", err)})
 	}
 
 	savedPassword, err := s.Storage.GetValues(uuid, []string{"Password"})
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"msg": "User does not have a password"})
+		return c.JSON(http.StatusNotFound, map[string]string{"msg": fmt.Sprintf("User does not have a password: %v", err)})
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(savedPassword["Password"]), []byte(pass))

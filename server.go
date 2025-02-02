@@ -84,8 +84,9 @@ func (s *ServerBU) StartServer() error {
 	e.Use(cMiddleware.OptionalJWT([]byte(s.secretKey)))
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:1337"},
-		AllowHeaders: []string{"Authorization", "Content-Type"},
+		AllowOrigins:     []string{"http://localhost:1337"},
+		AllowHeaders:     []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
 	}))
 	//e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
 

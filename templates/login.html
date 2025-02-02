@@ -61,37 +61,37 @@
 <body>
     {{ template "header.html" .}}
 
-    <!-- Login Page -->
+    <!-- login page -->
     <div id="login-page">
     <div class="container">
-        <h2>Login</h2>
-        <form id="login-form" action="/login" method="POST"> 
-            <input type="email" id="login-email" name="email" placeholder="Email" required>
-            <input type="password" id="login-password" name="password" placeholder="Password" required>
-            <input type="submit" value="Login">
+        <h2>login</h2>
+        <form id="login-form" action="/login" method="post"> 
+            <input type="email" id="login-email" name="email" placeholder="email" required>
+            <input type="password" id="login-password" name="password" placeholder="password" required>
+            <input type="submit" value="login">
         </form>
-        <a href="#" class="toggle-link" onclick="showRegisterPage()">Don't have an account? Register here.</a>
+        <a href="#" class="toggle-link" onclick="showregisterpage()">don't have an account? register here.</a>
     </div>
     <p id="login-message"></p>
     </div>
 
-    <!-- Register Page -->
+    <!-- register page -->
         <div>
     <div id="register-page" class="container" style="display: none;">
-        <h2>Register</h2>
+        <h2>register</h2>
         <form id="register-form" action="/register" method="post">
-            <input type="text" id="register-username" name="username" placeholder="Username" required>
-            <input type="email" id="register-email" name="email" placeholder="Email" required>
-            <input type="password" id="register-password" name="password" placeholder="Password" required>
-            <input type="submit" value="Register">
+            <input type="text" id="register-username" name="username" placeholder="username" required>
+            <input type="email" id="register-email" name="email" placeholder="email" required>
+            <input type="password" id="register-password" name="password" placeholder="password" required>
+            <input type="submit" value="register">
         </form>
-        <a href="#" class="toggle-link" onclick="showLoginPage()">Already have an account? Login here.</a>
+        <a href="#" class="toggle-link" onclick="showloginpage()">already have an account? login here.</a>
                 </div>
      <p id="register-message"></p>
     </div>
     
         {{ template "footer.html" .}}
-    <script>
+   <script>
         // Function to show the register page and hide the login page
         function showRegisterPage() {
             document.getElementById('login-page').style.display = 'none';
@@ -103,7 +103,9 @@
             document.getElementById('register-page').style.display = 'none';
             document.getElementById('login-page').style.display = 'block';
         }
+    
 
+        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async function(event) {
             event.preventDefault();
             const formData = new FormData(this);
@@ -114,20 +116,19 @@
                 // authorization header on the respose
                 const response = await fetch('/login', {
                     method: 'POST',
-                    headers: {'Content-Type': "application/json"},
                     body: formData,
                     credentials: 'include'
                 });
-                console.log('JAMONJAMONJAMONJASODAS$$$$$$$$$$$$$$$$$$$')
 
                 if (response.ok) {
                     const result = await response.json();
-                    messageElement.style.color = "green";
-                    messageElement.textContent = 'You correctly logged in!!';
-                    messageElement.classList.remove('error');
-                    messageElement.classList.add('success');
+                    //messageElement.style.color = "green";
+                    //messageElement.textContent = 'You correctly logged in!!';
+                    //messageElement.classList.remove('error');
+                    //messageElement.classList.add('success');
                     // Sets JWT for client to save
                     localStorage.setItem('token', result.token);
+                    location.replace("/getAll");
                 } else {
                     const errorMessage = await response.json(); // Read error message from response
                     messageElement.textContent = errorMessage['msg'] || 'Login failed. Please check your credentials.';

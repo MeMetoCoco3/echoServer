@@ -45,16 +45,12 @@
 <header>
       <div class="nav-container">
         <img src="/static/logo1.png" alt="Logo" class="logo">
-        <nav>
           <ul class="nav-links">
             <li><a href="/getAll">Home</a></li>
             <li><a href="/about">About</a></li>
-            {{ if .IsLoggedIn }}
-                <li><a href="/register">Logout</a></li>
-            {{ else }}
-                <li><a href="/register">Login</a></li>
-            {{ end }}
+            <li id="auth-link"><a href="/register">Login</a></li> 
           </ul>
         </nav>
       </div>
+    
 </header>
