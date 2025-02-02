@@ -82,6 +82,11 @@ func (s *ServerBU) StartServer() error {
 	e.Use(cMiddleware.ResponseLogger)
 	e.Use(cMiddleware.RealIP)
 	e.Use(cMiddleware.OptionalJWT([]byte(s.secretKey)))
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:1337"},
+		AllowHeaders: []string{"Authorization", "Content-Type"},
+	}))
 	//e.Use(middleware.LoggerWithConfig(CustomLoggerConfig))
 
 	e.Static("/static", "static")
@@ -90,9 +95,9 @@ func (s *ServerBU) StartServer() error {
 	})
 	e.GET("/get/:id", s.handleGet)
 	e.GET("/getAll", s.handleGetAll)
-	e.GET("/register", s.handleLogInGet)
+	e.GET("/register", s.handleLoginGet)
 	e.POST("/register", s.handleRegister)
-	e.POST("/login", s.handleLogInPost)
+	e.POST("/login", s.handleLoginPost)
 	e.PUT("/put/:name/:role/:age", s.handlePut)
 	e.POST("/update/:id/:field", s.handleUpdateUserData)
 	e.POST("/delete/:id", s.handleDelete)

@@ -1,3 +1,5 @@
+/*  <!DOCTYPE html> */
+
 .logo {
     height: 40px;
 }
@@ -123,4 +125,29 @@ header {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+#login-message {
+    display: none; /* Initially hidden */
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
 
+#login-message.error {
+    display: block;
+    background-color: #ffdddd;
+    color: #d8000c;
+    border: 1px solid #d8000c;
+}
+
+#login-message.success {
+    display: block;
+    background-color: #ddffdd;
+    color: #4F8A10;
+    border: 1px solid #4F8A10;
+}

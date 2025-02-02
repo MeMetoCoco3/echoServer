@@ -2,22 +2,22 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"time"
-
 	cMiddleware "github.com/MeMetoCoco3/echoServer/middleware"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
+	"log"
+	"net/http"
+	"time"
 )
 
-func (s *ServerBU) handleLogInGet(c echo.Context) error {
+func (s *ServerBU) handleLoginGet(c echo.Context) error {
 	res := &Response{IsLoggedIn: false}
 	SetIsLogged(c.Get("user"), res)
 
 	return c.Render(http.StatusOK, "login.html", res)
 }
 
-func (s *ServerBU) handleLogInPost(c echo.Context) error {
+func (s *ServerBU) handleLoginPost(c echo.Context) error {
 	res := &Response{IsLoggedIn: false}
 	SetIsLogged(c.Get("user"), res)
 
@@ -37,9 +37,11 @@ func (s *ServerBU) handleLogInPost(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusConflict, map[string]string{"msg": "Password does not match"})
 	}
+	log.Println("Pre MakeJWT")
 	t, err := cMiddleware.MakeJWT(uuid, s.secretKey, time.Duration(time.Minute*2))
+	log.Println(err)
 	if err != nil {
-		return c.JSON(http.StatusConflict, map[string]string{"msg": "Error generating token"})
+		return c.JSON(http.StatusConflict, map[string]error{"msg": fmt.Errorf("Error generating token: %v", err)})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"token": t.SignedString})

@@ -42,6 +42,9 @@ func ResponseLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		status := crw.status
 
 		responseBody := crw.body.String()
+		if len(responseBody) > 100 {
+			responseBody = responseBody[:100]
+		}
 
 		if isTemplate(responseBody) {
 			responseBody = "<!DOCTYPE html>"
@@ -61,7 +64,7 @@ func isTemplate(respose string) bool {
 		return false
 	}
 
-	for i := 0; i < resposeLen/10; i++ {
+	for i := 0; i < resposeLen; i++ {
 		if respose[i] == label[ptrLabel] {
 			ptrLabel++
 			if ptrLabel == len(label) {

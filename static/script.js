@@ -1,7 +1,5 @@
 function editField(event, fieldId, userID) {
-
-
-	event.preventDefault();
+  event.preventDefault();
   // Get the span element containing the data
   const spanElement = document.getElementById(fieldId);
   const currentValue = spanElement.innerText;
@@ -62,3 +60,17 @@ function saveField(fieldId, inputElement, userID) {
       alert("An error occurred while updating the field.");
     });
 }
+
+// Override fetch so it sends token with it
+const originalFetch = window.fetch; // save original fetch so we can still use it as original fetch
+window.fetch = async function(url, options={}){
+  const token = localStorage.getItem('token');
+  const headers = options.headers || {}; 
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return originalFetch(url, {...options, headers});
+};
+
