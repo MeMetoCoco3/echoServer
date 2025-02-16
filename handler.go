@@ -68,7 +68,7 @@ func (s *ServerBU) handleGetAll(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"msg": "Error fetching users"})
 	}
 	res.Content = users
-	return c.Render(http.StatusOK, "GetAllUsers.html", res)
+	return c.Render(http.StatusOK, "getAllUsers", res)
 }
 
 func (s *ServerBU) handleDelete(c echo.Context) error {
